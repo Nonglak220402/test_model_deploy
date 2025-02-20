@@ -33,8 +33,8 @@ if uploaded_file is not None:
     results = model(img)
 
     # Class names
-    class_names = ["0", "1", "2", "3", "4",
-                   "5", "6", "7", "8", "9"]
+    class_names = ["0:BooPadPongali", "1:Fried Fish Cakes", "2:Braised Pork", "3:Stir-fried Kale", "4:GaengJued",
+                   "5:Grilled Chicken", "6:Grilled Shrimp", "7:KkaoKlukKaphi", "8:Kuay Chap", "9:Yum woonsen"]
 
     for result in results:
         boxes = result.boxes.xyxy.cpu().numpy()  # Bounding box coordinates
