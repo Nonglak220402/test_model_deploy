@@ -12,8 +12,8 @@ model = YOLO("best.pt")  # Ensure best.pt is in the same directory
 st.title("🍛 Thai Food Classifier with YOLO")
 st.write("Upload an image of Thai food, and the model will classify it!")
 
-# Confidence threshold slider
-conf_threshold = st.slider("Confidence Threshold", 0.0, 1.0, 0.5, 0.05)
+# Set Confidence Threshold to 70% (0.7)
+conf_threshold = 0.7  
 
 # File uploader
 uploaded_file = st.file_uploader("Choose an image...", type=["jpg", "png", "jpeg"])
@@ -34,16 +34,16 @@ if uploaded_file is not None:
 
     # Class names
     class_names = [
-        "Boo Pad Pongali",    # 0: Stir-fried Crab in Yellow Curry
-        "Fried Fish Cakes",   # 1: Tod Mun Pla
-        "Braised Pork",       # 2: Moo Palo
-        "Stir-fried Kale",    # 3: Pad Kana
-        "Gaeng Jued",         # 4: Clear Soup with Vegetables and Tofu
-        "Grilled Chicken",    # 5: Gai Yang
-        "Grilled Shrimp",     # 6: Kung Pao
-        "Khao Kluk Kapi",     # 7: Shrimp Paste Fried Rice
-        "Kuay Chap",          # 8: Thai-Chinese Noodle Soup
-        "Yum Woon Sen"        # 9: Spicy Glass Noodle Salad
+        "Boo Pad Pongali",    
+        "Tod Mun",   
+        "Moo Palo",     
+        "Pad Kana",    
+        "Gaeng Jued",         
+        "Gai Yang",    
+        "Kung Pao",     
+        "Khao Kluk Kapi",    
+        "Kuay Chap",         
+        "Yum Woon Sen"        
     ]
 
     detected_classes = []  # Store detected class names
@@ -52,11 +52,6 @@ if uploaded_file is not None:
         boxes = result.boxes.xyxy.cpu().numpy()  # Bounding box coordinates
         scores = result.boxes.conf.cpu().numpy()  # Confidence scores
         classes = result.boxes.cls.cpu().numpy().astype(int)  # Class indices
-
-        # If no detections
-        if len(boxes) == 0:
-            st.write("⚠️ No detections found. Try another image.")
-            continue
 
         # Draw bounding boxes if above confidence threshold
         for i, (box, score, cls) in enumerate(zip(boxes, scores, classes)):
@@ -78,8 +73,10 @@ if uploaded_file is not None:
     # Display result
     st.image(img, caption="Predictions", use_column_width=True)
 
-    # Display detected class names
+    # Display detected class names or warning if none detected
     if detected_classes:
         st.write("### 🏷️ Predicted Classes:")
         for cls in detected_classes:
             st.write(f"- {cls}")
+    else:
+        st.write("⚠️ No detections found. Try another image.")
