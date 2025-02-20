@@ -6,7 +6,7 @@ import cv2
 from ultralytics import YOLO
 
 # Load the YOLO model
-model = YOLO("C:\Users\ADVICE_003\Desktop\New folder\test_model_deploy-1\best.pt")  # Ensure best.pt is in the same directory
+model = YOLO("best.pt")  # Ensure best.pt is in the same directory
 
 # Streamlit UI
 st.title("🍛 Thai Food Classifier with YOLO")
