@@ -23,21 +23,28 @@ if uploaded_file is not None:
     image = Image.open(uploaded_file)
     st.image(image, caption="Uploaded Image", use_column_width=True)
 
-    # Convert to OpenCV format
+    # Convert PIL image to NumPy array (RGB format)
     img = np.array(image)
 
-    # YOLO Prediction with confidence filtering
+    # Convert to BGR format for OpenCV
+    img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+
+    # YOLO Prediction
     results = model(img)
 
-    # Process results
-    for result in results:
-        boxes = result.boxes.xyxy  # Bounding box coordinates
-        scores = result.boxes.conf  # Confidence scores
-        classes = result.boxes.cls.int().tolist()  # Class indices
+    # Class names
+    class_names = ["Pad Thai", "Tom Yum", "Som Tum", "Green Curry", "Massaman Curry",
+                   "Khao Soi", "Moo Ping", "Pad Krapow", "Kai Jeow", "Khao Man Gai"]
 
-        # Class names
-        class_names = ["Pad Thai", "Tom Yum", "Som Tum", "Green Curry", "Massaman Curry",
-                       "Khao Soi", "Moo Ping", "Pad Krapow", "Kai Jeow", "Khao Man Gai"]
+    for result in results:
+        boxes = result.boxes.xyxy.cpu().numpy()  # Bounding box coordinates
+        scores = result.boxes.conf.cpu().numpy()  # Confidence scores
+        classes = result.boxes.cls.cpu().numpy().astype(int)  # Class indices
+
+        # If no detections
+        if len(boxes) == 0:
+            st.write("⚠️ No detections found. Try another image.")
+            continue
 
         # Draw bounding boxes if above confidence threshold
         for i, (box, score, cls) in enumerate(zip(boxes, scores, classes)):
@@ -48,9 +55,12 @@ if uploaded_file is not None:
             label = f"{class_names[cls]}: {score:.2f}"
 
             # Draw bounding box
-            img = cv2.rectangle(img, (x1, y1), (x2, y2), (0, 255, 0), 3)
-            img = cv2.putText(img, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX,
-                              0.7, (0, 255, 0), 2)
+            cv2.rectangle(img, (x1, y1), (x2, y2), (0, 255, 0), 3)
+            cv2.putText(img, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX,
+                        0.7, (0, 255, 0), 2)
 
-    # Convert image back to PIL format for displaying
+    # Convert back to RGB for Streamlit
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+    
+    # Display result
     st.image(img, caption="Predictions", use_column_width=True)
