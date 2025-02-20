@@ -33,8 +33,20 @@ if uploaded_file is not None:
     results = model(img)
 
     # Class names
-    class_names = ["0:BooPadPongali", "1:Fried Fish Cakes", "2:Braised Pork", "3:Stir-fried Kale", "4:GaengJued",
-                   "5:Grilled Chicken", "6:Grilled Shrimp", "7:KkaoKlukKaphi", "8:Kuay Chap", "9:Yum woonsen"]
+    class_names = [
+        "Boo Pad Pongali",    # 0: Stir-fried Crab in Yellow Curry
+        "Fried Fish Cakes",   # 1: Tod Mun Pla
+        "Braised Pork",       # 2: Moo Palo
+        "Stir-fried Kale",    # 3: Pad Kana
+        "Gaeng Jued",         # 4: Clear Soup with Vegetables and Tofu
+        "Grilled Chicken",    # 5: Gai Yang
+        "Grilled Shrimp",     # 6: Kung Pao
+        "Khao Kluk Kapi",     # 7: Shrimp Paste Fried Rice
+        "Kuay Chap",          # 8: Thai-Chinese Noodle Soup
+        "Yum Woon Sen"        # 9: Spicy Glass Noodle Salad
+    ]
+
+    detected_classes = []  # Store detected class names
 
     for result in results:
         boxes = result.boxes.xyxy.cpu().numpy()  # Bounding box coordinates
@@ -53,6 +65,7 @@ if uploaded_file is not None:
 
             x1, y1, x2, y2 = map(int, box)  # Convert box to integers
             label = f"{class_names[cls]}: {score:.2f}"
+            detected_classes.append(class_names[cls])  # Store detected class name
 
             # Draw bounding box
             cv2.rectangle(img, (x1, y1), (x2, y2), (0, 255, 0), 3)
@@ -64,3 +77,9 @@ if uploaded_file is not None:
     
     # Display result
     st.image(img, caption="Predictions", use_column_width=True)
+
+    # Display detected class names
+    if detected_classes:
+        st.write("### 🏷️ Predicted Classes:")
+        for cls in detected_classes:
+            st.write(f"- {cls}")
